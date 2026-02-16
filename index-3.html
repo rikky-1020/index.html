@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔬 理科 学習ホーム</title>
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --c-bg: #f7f9f7;
+  --c-surface: #ffffff;
+  --c-text: #1e2a22;
+  --c-text-sub: #5f7365;
+  --c-border: #dde8df;
+  --c-accent: #2d8659;
+  --c-physics: #3a7fc1;
+  --c-chemistry: #2d8659;
+  --c-biology: #d4853a;
+  --c-earth: #7e62a7;
+  --c-star-on: #e6ad2e;
+  --c-star-off: #c8d5cb;
+  --c-keyword: #c0392b;
+  --c-correct: #27ae60;
+  --c-wrong: #c0392b;
+  --radius: 14px;
+  --shadow-card: 0 2px 8px rgba(30,60,40,.06), 0 1px 3px rgba(30,60,40,.04);
+  --shadow-card-hover: 0 6px 20px rgba(30,60,40,.1), 0 2px 6px rgba(30,60,40,.06);
+  --font-display: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  --transition: .25s cubic-bezier(.4,0,.2,1);
+}
+
+html { font-size: 15px; }
+body {
+  font-family: var(--font-display); background: var(--c-bg); color: var(--c-text);
+  line-height: 1.7; min-height: 100dvh; -webkit-font-smoothing: antialiased;
+}
+
+.header {
+  background: linear-gradient(135deg, #2d8659 0%, #1f6b45 100%);
+  color: #fff; padding: 2rem 1.25rem 1.5rem; text-align: center;
+  position: relative; overflow: hidden;
+}
+.header::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(255,255,255,.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(255,255,255,.06) 0%, transparent 40%);
+  pointer-events: none;
+}
+.header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: .04em; position: relative; }
+.header p { font-size: .82rem; opacity: .8; margin-top: .35rem; position: relative; }
+.back-link {
+  display: inline-flex; align-items: center; gap: .3rem; font-size: .82rem;
+  color: rgba(255,255,255,.85); text-decoration: none; position: relative;
+  margin-bottom: .6rem; transition: color var(--transition); cursor: pointer;
+}
+.back-link:hover { color: #fff; }
+
+.container { max-width: 640px; margin: 0 auto; padding: 0 1rem 3rem; }
+
+/* Top Nav */
+.top-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  margin: -1rem auto .75rem; padding: .55rem .75rem; position: relative; z-index: 3;
+}
+.top-nav-btn {
+  display: inline-flex; align-items: center; gap: .2rem;
+  font-size: .78rem; font-weight: 600; color: var(--c-accent);
+  cursor: pointer; padding: .25rem .45rem; border-radius: 8px;
+  transition: background var(--transition); white-space: nowrap;
+}
+.top-nav-btn:hover { background: rgba(45,134,89,.08); }
+.top-nav-btn.disabled { opacity: .3; pointer-events: none; }
+.top-nav-center {
+  font-size: .72rem; color: var(--c-text-sub); font-weight: 600;
+  text-align: center; flex: 1; min-width: 0;
+}
+
+/* Filters */
+.filters {
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  margin: -1rem auto 1.25rem; padding: 1rem 1rem .85rem; position: relative; z-index: 2;
+}
+.filter-row { margin-bottom: .75rem; }
+.filter-row:last-child { margin-bottom: 0; }
+.filter-label {
+  display: block; font-size: .7rem; font-weight: 600; color: var(--c-text-sub);
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: .35rem;
+}
+.chip-group { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip {
+  display: inline-block; padding: .3rem .7rem; font-size: .78rem; font-weight: 500;
+  border-radius: 99px; border: 1.5px solid var(--c-border); background: transparent;
+  color: var(--c-text-sub); cursor: pointer; transition: all var(--transition);
+  user-select: none; white-space: nowrap;
+}
+.chip:hover { border-color: var(--c-accent); color: var(--c-accent); }
+.chip.active { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+
+.search-box { position: relative; }
+.search-box input {
+  width: 100%; padding: .55rem .75rem .55rem 2.2rem;
+  border: 1.5px solid var(--c-border); border-radius: 10px; font-size: .85rem;
+  font-family: inherit; background: var(--c-bg); color: var(--c-text);
+  outline: none; transition: border-color var(--transition);
+}
+.search-box input:focus { border-color: var(--c-accent); }
+.search-box .icon-search {
+  position: absolute; left: .7rem; top: 50%; transform: translateY(-50%);
+  font-size: .9rem; color: var(--c-text-sub); pointer-events: none;
+}
+.sort-select { display: flex; align-items: center; gap: .5rem; }
+.sort-select select {
+  flex: 1; padding: .45rem .6rem; border: 1.5px solid var(--c-border); border-radius: 10px;
+  font-size: .82rem; font-family: inherit; background: var(--c-bg); color: var(--c-text);
+  outline: none; cursor: pointer;
+}
+
+.result-info { font-size: .78rem; color: var(--c-text-sub); margin-bottom: .6rem; padding-left: .15rem; }
+
+/* Cards */
+.card-list { display: flex; flex-direction: column; gap: .65rem; }
+.unit-card, .scene-card {
+  display: grid; grid-template-columns: 4px 1fr auto; align-items: center;
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  padding: .9rem 1rem .9rem .85rem; cursor: pointer;
+  transition: box-shadow var(--transition), transform var(--transition);
+  gap: 0 .75rem; position: relative; overflow: hidden; text-decoration: none; color: inherit;
+}
+.unit-card:hover, .scene-card:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-2px); }
+.unit-card:active, .scene-card:active { transform: translateY(0); }
+
+.cat-bar { width: 4px; border-radius: 4px; align-self: stretch; }
+.cat-bar[data-cat="physics"]   { background: var(--c-physics); }
+.cat-bar[data-cat="chemistry"] { background: var(--c-chemistry); }
+.cat-bar[data-cat="biology"]   { background: var(--c-biology); }
+.cat-bar[data-cat="earth"]     { background: var(--c-earth); }
+
+.card-body { min-width: 0; }
+.card-title { font-size: .92rem; font-weight: 600; line-height: 1.4; margin-bottom: .2rem; }
+.card-meta { display: flex; align-items: center; gap: .65rem; font-size: .73rem; color: var(--c-text-sub); }
+
+.cat-tag {
+  display: inline-block; padding: .1rem .45rem; border-radius: 6px;
+  font-size: .65rem; font-weight: 600; color: #fff; letter-spacing: .03em;
+}
+.cat-tag[data-cat="physics"]   { background: var(--c-physics); }
+.cat-tag[data-cat="chemistry"] { background: var(--c-chemistry); }
+.cat-tag[data-cat="biology"]   { background: var(--c-biology); }
+.cat-tag[data-cat="earth"]     { background: var(--c-earth); }
+
+.stars { display: flex; gap: 2px; font-size: .85rem; line-height: 1; flex-shrink: 0; }
+.star-on  { color: var(--c-star-on); }
+.star-off { color: var(--c-star-off); }
+.scene-number {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.6rem; height: 1.6rem; border-radius: 50%;
+  background: var(--c-earth); color: #fff; font-size: .7rem; font-weight: 700; flex-shrink: 0;
+}
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--c-text-sub); font-size: .9rem; }
+.empty-state .icon { font-size: 2.2rem; margin-bottom: .5rem; }
+
+/* Info Card */
+.info-card {
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  margin: -1rem auto 1.25rem; padding: 1.15rem 1.15rem 1rem; position: relative; z-index: 2;
+}
+.info-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .5rem; margin-bottom: .65rem;
+}
+.info-meta { display: flex; align-items: center; gap: .6rem; font-size: .78rem; color: var(--c-text-sub); }
+.info-summary { font-size: .85rem; color: var(--c-text-sub); line-height: 1.75; }
+
+.chapter-group-label {
+  font-size: .72rem; font-weight: 700; color: var(--c-earth);
+  margin: 1rem 0 .4rem .15rem; letter-spacing: .05em;
+}
+.chapter-group-label:first-of-type { margin-top: .2rem; }
+
+/* Content Card */
+.content-card {
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  margin: 0 auto 1rem; padding: 1.15rem 1.15rem 1.25rem; position: relative;
+}
+.content-card h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: .75rem; line-height: 1.4; }
+
+.figure-area {
+  background: var(--c-bg); border: 1.5px dashed var(--c-border); border-radius: 10px;
+  padding: 1.5rem 1rem; text-align: center; margin-bottom: 1rem; color: var(--c-text-sub); font-size: .82rem;
+}
+.content-prose { font-size: .88rem; line-height: 1.85; }
+.content-prose p { margin-bottom: .8rem; }
+.content-prose p:last-child { margin-bottom: 0; }
+
+/* ===== Keyword: READ mode (tap to reveal) ===== */
+.kw {
+  display: inline; font-weight: 700; color: transparent;
+  background: var(--c-keyword); border-radius: 4px; padding: 0 .15em;
+  cursor: pointer; user-select: none; transition: all .2s ease;
+}
+.kw:hover { opacity: .85; }
+.kw.revealed {
+  color: var(--c-keyword); background: rgba(192,57,43,.1); cursor: default;
+}
+
+/* ===== Keyword: FILL mode (input box) ===== */
+.kw-fill-wrap {
+  display: inline-flex; align-items: baseline; gap: .2em;
+  vertical-align: baseline;
+}
+.kw-input {
+  font-family: inherit; font-size: .85em; font-weight: 600;
+  border: none; border-bottom: 2px solid var(--c-keyword);
+  background: rgba(192,57,43,.06); color: var(--c-text);
+  padding: .05em .3em; border-radius: 3px 3px 0 0;
+  outline: none; min-width: 3em; text-align: center;
+  transition: border-color var(--transition);
+}
+.kw-input:focus { border-bottom-color: var(--c-accent); background: rgba(45,134,89,.06); }
+.kw-input.correct {
+  border-bottom-color: var(--c-correct); background: rgba(39,174,96,.1);
+  color: var(--c-correct); pointer-events: none;
+}
+.kw-input.wrong {
+  border-bottom-color: var(--c-wrong); background: rgba(192,57,43,.08);
+  color: var(--c-wrong); pointer-events: none;
+}
+.kw-result {
+  font-size: .82em; font-weight: 700; white-space: nowrap;
+}
+.kw-result.is-correct { color: var(--c-correct); }
+.kw-result.is-wrong { color: var(--c-wrong); }
+
+/* ===== Keyword: SELECT mode (4-choice) ===== */
+.kw-select-blank {
+  display: inline-block; font-weight: 700; color: var(--c-keyword);
+  background: rgba(192,57,43,.08); border: 1.5px dashed var(--c-keyword);
+  border-radius: 5px; padding: .05em .4em; cursor: pointer;
+  user-select: none; transition: all .2s ease; min-width: 2.5em; text-align: center;
+  font-size: .85em;
+}
+.kw-select-blank:hover { background: rgba(192,57,43,.15); }
+.kw-select-blank.answered-correct {
+  background: rgba(39,174,96,.12); border-color: var(--c-correct); color: var(--c-correct);
+  cursor: default; border-style: solid;
+}
+.kw-select-blank.answered-wrong {
+  background: rgba(192,57,43,.1); border-color: var(--c-wrong); color: var(--c-wrong);
+  cursor: default; text-decoration: line-through; border-style: solid;
+}
+
+.select-popup-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100;
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: fadeIn .15s ease;
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.select-popup {
+  background: var(--c-surface); border-radius: 18px 18px 0 0; padding: 1.2rem 1rem 1.5rem;
+  width: 100%; max-width: 480px; box-shadow: 0 -4px 24px rgba(0,0,0,.15);
+  animation: slideUp .2s ease;
+}
+@keyframes slideUp { from { transform: translateY(40px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+
+.select-popup-q {
+  font-size: .82rem; color: var(--c-text-sub); text-align: center;
+  margin-bottom: .75rem; font-weight: 600;
+}
+.select-popup-opts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .45rem;
+}
+.select-opt-btn {
+  padding: .65rem .5rem; font-size: .88rem; font-weight: 600; font-family: inherit;
+  border: 2px solid var(--c-border); border-radius: 10px; background: var(--c-bg);
+  color: var(--c-text); cursor: pointer; transition: all .15s ease; text-align: center;
+}
+.select-opt-btn:hover { border-color: var(--c-accent); background: rgba(45,134,89,.06); }
+.select-opt-btn:active { transform: scale(.97); }
+.select-opt-btn.opt-correct {
+  border-color: var(--c-correct); background: rgba(39,174,96,.12); color: var(--c-correct);
+}
+.select-opt-btn.opt-wrong {
+  border-color: var(--c-wrong); background: rgba(192,57,43,.08); color: var(--c-wrong);
+}
+.select-opt-btn.opt-dimmed { opacity: .4; pointer-events: none; }
+
+/* Mode button select color */
+.mode-btn.active-select { background: #e67e22; border-color: #e67e22; color: #fff; }
+.mode-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  margin: 0 auto .75rem; padding: .5rem .85rem;
+}
+.mode-label { font-size: .75rem; color: var(--c-text-sub); font-weight: 600; }
+.mode-toggle { display: flex; gap: .3rem; }
+.mode-btn {
+  padding: .25rem .6rem; font-size: .72rem; font-weight: 600;
+  border-radius: 99px; border: 1.5px solid var(--c-border); background: transparent;
+  color: var(--c-text-sub); cursor: pointer; transition: all var(--transition);
+  font-family: inherit;
+}
+.mode-btn:hover { border-color: var(--c-accent); color: var(--c-accent); }
+.mode-btn.active { background: var(--c-keyword); border-color: var(--c-keyword); color: #fff; }
+.mode-btn.active-read { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+
+/* Action bar */
+.action-bar {
+  display: flex; align-items: center; justify-content: flex-end; gap: .4rem;
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  margin: 0 auto .75rem; padding: .4rem .85rem;
+}
+.action-btn {
+  padding: .3rem .7rem; font-size: .72rem; font-weight: 600;
+  border-radius: 8px; border: 1.5px solid var(--c-border); background: transparent;
+  color: var(--c-text-sub); cursor: pointer; font-family: inherit;
+  transition: all var(--transition);
+}
+.action-btn:hover { border-color: var(--c-accent); color: var(--c-accent); }
+.action-btn.primary {
+  background: var(--c-keyword); border-color: var(--c-keyword); color: #fff;
+}
+.action-btn.primary:hover { opacity: .9; }
+
+/* Score display */
+.score-bar {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  background: var(--c-surface); border-radius: var(--radius); box-shadow: var(--shadow-card);
+  margin: 0 auto .75rem; padding: .55rem .85rem;
+  font-size: .85rem; font-weight: 700;
+}
+.score-bar .score-correct { color: var(--c-correct); }
+.score-bar .score-wrong { color: var(--c-wrong); }
+
+/* Glossary */
+.glossary-block { margin-top: 1rem; }
+.glossary-block details {
+  background: var(--c-bg); border: 1.5px solid var(--c-border); border-radius: 10px;
+  padding: .6rem .85rem; margin-bottom: .5rem; font-size: .83rem;
+  transition: background var(--transition);
+}
+.glossary-block details[open] { background: #eef4ef; }
+.glossary-block summary {
+  font-weight: 600; cursor: pointer; color: var(--c-accent);
+  list-style: none; display: flex; align-items: center; gap: .4rem;
+}
+.glossary-block summary::before { content: "▶"; font-size: .6rem; transition: transform var(--transition); }
+.glossary-block details[open] summary::before { transform: rotate(90deg); }
+.glossary-block summary::-webkit-details-marker { display: none; }
+.glossary-block .glossary-body {
+  margin-top: .5rem; padding-top: .5rem; border-top: 1px solid var(--c-border);
+  color: var(--c-text-sub); line-height: 1.7;
+}
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+.anim-fade { animation: fadeUp .35s ease both; }
+
+@media (min-width: 520px) {
+  .filters { padding: 1.15rem 1.25rem 1rem; }
+  .unit-card, .scene-card { padding: 1rem 1.15rem 1rem 1rem; }
+  .info-card { padding: 1.25rem 1.35rem 1.1rem; }
+  .content-card { padding: 1.25rem 1.35rem 1.35rem; }
+}
+
+</style>
+</head>
+<body>
+
+<header class="header" id="header"></header>
+<div class="container" id="app"></div>
+
+<script>
+var CL = { physics:"物理", chemistry:"化学", biology:"生物", earth:"地学" };
+
+var units = [
+  {
+    id:"g1-ear-01", grade:1, category:"earth", title:"大地の変化",
+    difficulty:3, estMin:45, tags:[],
+    summary:"火山の噴火や地震は、地球内部のエネルギーによって起こります。また、大地は長い時間をかけて風化・侵食・堆積を繰り返し、地層をつくります。この単元では、火山・地震・地層の3つの視点から「大地の変化」を学びます。",
+    chapters:[
+      { id:"ch1", title:"火を吹く火山", subtitle:"一章", scenes:[
+        { id:"c1s1", num:"1-1", title:"マグマと噴火のしくみ" },
+        { id:"c1s2", num:"1-2", title:"火山の形と噴火の様子" },
+        { id:"c1s3", num:"1-3", title:"火山噴出物と鉱物" },
+        { id:"c1s4", num:"1-4", title:"火成岩のなかま" }]},
+      { id:"ch2", title:"動き続ける大地", subtitle:"二章", scenes:[
+        { id:"c2s1", num:"2-1", title:"地震のゆれと波" },
+        { id:"c2s2", num:"2-2", title:"震度とマグニチュード" },
+        { id:"c2s3", num:"2-3", title:"プレートと地震・火山の分布" }]},
+      { id:"ch3", title:"地層から読みとる大地の変化", subtitle:"三章", scenes:[
+        { id:"c3s1", num:"3-1", title:"風化・侵食・堆積" },
+        { id:"c3s2", num:"3-2", title:"堆積岩のなかま" },
+        { id:"c3s3", num:"3-3", title:"化石が語ること" },
+        { id:"c3s4", num:"3-4", title:"大地の変動──しゅう曲と断層" }]}
+    ]
+  }
+];
+
+var unitMap = {
+  "g1-ear-01": "./units/g1-ear-01.html"
+};
+
+var appState = {
+  page:"home", unitId:null,
+  grade:"all", category:"all", difficulty:"all", search:"", sort:"recommend"
+};
+
+function renderStars(d) {
+  var s = ""; for (var i=1;i<=5;i++) s += '<span class="'+(i<=d?"star-on":"star-off")+'">★</span>'; return s;
+}
+
+function renderHeader() {
+  var h = document.getElementById("header");
+  h.innerHTML = '<h1>🔬 理科 学習ホーム</h1><p>中学理科 ── 単元をえらんで学習しよう</p>';
+}
+
+function renderHome() {
+  var filtered = units.filter(function(u) {
+    if (appState.grade!=="all" && u.grade!==Number(appState.grade)) return false;
+    if (appState.category!=="all" && u.category!==appState.category) return false;
+    if (appState.difficulty!=="all" && u.difficulty!==Number(appState.difficulty)) return false;
+    if (appState.search && !u.title.toLowerCase().includes(appState.search.toLowerCase())) return false;
+    return true;
+  });
+  var sorted = filtered.slice();
+  switch(appState.sort) {
+    case "diff-asc": sorted.sort(function(a,b){return a.difficulty-b.difficulty;}); break;
+    case "diff-desc": sorted.sort(function(a,b){return b.difficulty-a.difficulty;}); break;
+    case "time": sorted.sort(function(a,b){return a.estMin-b.estMin;}); break;
+  }
+  var html =
+    '<section class="filters" id="filters">' +
+      '<div class="filter-row"><span class="filter-label">学年</span><div class="chip-group" data-filter="grade">' +
+        '<span class="chip'+(appState.grade==="all"?" active":"")+'" data-value="all">総合</span>' +
+        '<span class="chip'+(appState.grade==="1"?" active":"")+'" data-value="1">中1</span>' +
+        '<span class="chip'+(appState.grade==="2"?" active":"")+'" data-value="2">中2</span>' +
+        '<span class="chip'+(appState.grade==="3"?" active":"")+'" data-value="3">中3</span></div></div>' +
+      '<div class="filter-row"><span class="filter-label">カテゴリ</span><div class="chip-group" data-filter="category">' +
+        '<span class="chip'+(appState.category==="all"?" active":"")+'" data-value="all">すべて</span>' +
+        '<span class="chip'+(appState.category==="physics"?" active":"")+'" data-value="physics">物理</span>' +
+        '<span class="chip'+(appState.category==="chemistry"?" active":"")+'" data-value="chemistry">化学</span>' +
+        '<span class="chip'+(appState.category==="biology"?" active":"")+'" data-value="biology">生物</span>' +
+        '<span class="chip'+(appState.category==="earth"?" active":"")+'" data-value="earth">地学</span></div></div>' +
+      '<div class="filter-row"><span class="filter-label">難易度</span><div class="chip-group" data-filter="difficulty">' +
+        '<span class="chip'+(appState.difficulty==="all"?" active":"")+'" data-value="all">全て</span>' +
+        '<span class="chip'+(appState.difficulty==="1"?" active":"")+'" data-value="1">1</span>' +
+        '<span class="chip'+(appState.difficulty==="2"?" active":"")+'" data-value="2">2</span>' +
+        '<span class="chip'+(appState.difficulty==="3"?" active":"")+'" data-value="3">3</span>' +
+        '<span class="chip'+(appState.difficulty==="4"?" active":"")+'" data-value="4">4</span>' +
+        '<span class="chip'+(appState.difficulty==="5"?" active":"")+'" data-value="5">5</span></div></div>' +
+      '<div class="filter-row"><span class="filter-label">検索</span><div class="search-box"><span class="icon-search">🔍</span>' +
+        '<input type="text" id="searchInput" placeholder="単元名で検索…" value="'+appState.search+'"></div></div>' +
+      '<div class="filter-row"><span class="filter-label">並び替え</span><div class="sort-select"><select id="sortSelect">' +
+        '<option value="recommend"'+(appState.sort==="recommend"?" selected":"")+'>おすすめ</option>' +
+        '<option value="diff-asc"'+(appState.sort==="diff-asc"?" selected":"")+'>難易度 ▲ 昇順</option>' +
+        '<option value="diff-desc"'+(appState.sort==="diff-desc"?" selected":"")+'>難易度 ▼ 降順</option>' +
+        '<option value="time"'+(appState.sort==="time"?" selected":"")+'>目安時間</option></select></div></div>' +
+    '</section><div class="result-info">'+sorted.length+' 件の単元</div>';
+  if (!sorted.length) {
+    html += '<div class="empty-state"><div class="icon">🔭</div>条件に合う単元がありません</div>';
+  } else {
+    html += '<div class="card-list" id="cardList">';
+    for (var i=0;i<sorted.length;i++) {
+      var u=sorted[i];
+      html += '<a class="unit-card anim-fade" href="'+unitMap[u.id]+'" style="animation-delay:'+(i*.04)+'s;text-decoration:none;color:inherit;">' +
+        '<div class="cat-bar" data-cat="'+u.category+'"></div><div class="card-body">' +
+        '<div class="card-title">'+u.title+'</div><div class="card-meta">' +
+        '<span class="cat-tag" data-cat="'+u.category+'">'+CL[u.category]+'</span>' +
+        '<span>⏱ '+u.estMin+'分</span></div></div>' +
+        '<div class="stars">'+renderStars(u.difficulty)+'</div></a>';
+    }
+    html += '</div>';
+  }
+  return html;
+}
+
+function render() {
+  renderHeader();
+  document.getElementById("app").innerHTML = renderHome();
+  var se = document.getElementById("searchInput");
+  if (se) se.addEventListener("input", function(e) {
+    appState.search = e.target.value; render();
+    var el = document.getElementById("searchInput");
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  });
+  var so = document.getElementById("sortSelect");
+  if (so) so.addEventListener("change", function(e) { appState.sort = e.target.value; render(); });
+}
+
+document.addEventListener("click", function(e) {
+  var chip = e.target.closest(".chip");
+  if (chip) {
+    var group = chip.closest(".chip-group");
+    if (group) {
+      group.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");});
+      chip.classList.add("active");
+      appState[group.dataset.filter] = chip.dataset.value;
+      render(); return;
+    }
+  }
+});
+
+render();
+</script>
+</body>
+</html>
